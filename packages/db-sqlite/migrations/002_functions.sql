@@ -1,0 +1,6 @@
+-- Intentionally empty migration slot.
+--
+-- In PostgreSQL, onBlank convention reserves 002_functions.sql for SQL/PLpgSQL
+-- functions. SQLite does not support persisted CREATE FUNCTION definitions.
+-- Any SQLite custom functions required later are registered from TypeScript in
+-- packages/db-sqlite/src/functions without changing this migration convention.

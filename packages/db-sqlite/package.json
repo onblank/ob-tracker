@@ -1,0 +1,19 @@
+{
+  "name": "@obt/db-sqlite",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@obt/domain": "workspace:*",
+    "@obt/contracts": "workspace:*",
+    "@obt/settings": "workspace:*",
+    "better-sqlite3": "13.0.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "9.6.0"
+  }
+}

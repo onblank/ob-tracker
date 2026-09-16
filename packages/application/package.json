@@ -1,0 +1,16 @@
+{
+  "name": "@obt/application",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@obt/domain": "workspace:*",
+    "@obt/contracts": "workspace:*",
+    "@obt/settings": "workspace:*",
+    "zod": "4.6.5"
+  }
+}

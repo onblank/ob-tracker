@@ -1,0 +1,57 @@
+appId: com.onblanksystems.obtracker
+productName: OB-Tracker
+copyright: Copyright © onBlank Systems
+asar: true
+asarUnpack:
+  - node_modules/better-sqlite3/**
+files:
+  - dist/**
+  - package.json
+extraResources:
+  - from: ../../packages/db-sqlite/migrations
+    to: migrations
+    filter:
+      - "*.sql"
+  - from: build/tray-icon.png
+    to: tray-icon.png
+directories:
+  output: release
+  buildResources: build
+artifactName: "OB-Tracker-${version}-${os}-${arch}.${ext}"
+fileAssociations:
+  - ext: obtracker
+    name: OB-Tracker Data Export
+    description: OB-Tracker portable data export
+    role: Editor
+    mimeType: application/x-obtracker
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+  publisherName: onBlank Systems
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+mac:
+  icon: build/icon.icns
+  target:
+    - target: dmg
+      arch:
+        - universal
+  category: public.app-category.productivity
+  hardenedRuntime: true
+  gatekeeperAssess: false
+linux:
+  icon: build/icon.png
+  category: Office
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64

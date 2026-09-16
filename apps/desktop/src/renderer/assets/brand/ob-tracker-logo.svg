@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 140" role="img" aria-label="OB-Tracker placeholder logo">
+  <rect width="520" height="140" rx="28" fill="none"/>
+  <rect x="10" y="24" width="92" height="92" rx="28" fill="#5C6BFF"/>
+  <path d="M34 70a22 22 0 1 1 44 0 22 22 0 1 1-44 0Z" fill="none" stroke="#F7F8FC" stroke-width="8"/>
+  <path d="M56 47v23l15 10" fill="none" stroke="#B8FFD8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="124" y="84" font-family="Arial, sans-serif" font-size="54" font-weight="700" fill="#F7F8FC">OB-Tracker</text>
+</svg>
