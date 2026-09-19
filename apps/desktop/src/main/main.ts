@@ -106,7 +106,8 @@ const configuredShortcut = settings.get().globalShortcut;
 if (configuredShortcut) {
   const registered = globalShortcut.register(configuredShortcut, () => {
     if (!mainWindow) return;
-    mainWindow.isVisible() ? mainWindow.hide() : showMainWindow();
+    if (mainWindow.isVisible()) mainWindow.hide();
+    else showMainWindow();
   });
   if (!registered) console.warn(`Global shortcut could not be registered: ${configuredShortcut}`);
 }
