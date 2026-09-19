@@ -8,7 +8,13 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    window.obTracker.getBootstrapState().then(setState).catch((reason: unknown) => {
+    const desktopApi = window.obTracker;
+    if (!desktopApi) {
+      setError('Desktop bridge unavailable. Open OB-Tracker through Electron.');
+      return;
+    }
+
+    desktopApi.getBootstrapState().then(setState).catch((reason: unknown) => {
       setError(reason instanceof Error ? reason.message : 'Unable to initialize OB-Tracker');
     });
   }, []);

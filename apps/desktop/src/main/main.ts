@@ -82,39 +82,46 @@ async function createWindow(): Promise<BrowserWindow> {
   return window;
 }
 
-await app.whenReady();
+async function start(): Promise<void> {
+  await app.whenReady();
 
-const db = openDatabase(join(app.getPath('userData'), 'ob-tracker.sqlite'));
-migrateDatabase(db, getMigrationsDirectory());
+  const db = openDatabase(join(app.getPath('userData'), 'ob-tracker.sqlite'));
+  migrateDatabase(db, getMigrationsDirectory());
 
-const workers = new SqliteWorkerRepository(db);
-const settings = new SqliteSettingsRepository(db);
-const unitOfWork = new SqliteUnitOfWork(db);
-const clock = new SystemClock();
-const ids = new CryptoIdGenerator();
-const getBootstrapState = new GetBootstrapState(workers, settings);
-const completeOnboarding = new CompleteOnboarding(workers, settings, unitOfWork, clock, ids);
+  const workers = new SqliteWorkerRepository(db);
+  const settings = new SqliteSettingsRepository(db);
+  const unitOfWork = new SqliteUnitOfWork(db);
+  const clock = new SystemClock();
+  const ids = new CryptoIdGenerator();
+  const getBootstrapState = new GetBootstrapState(workers, settings);
+  const completeOnboarding = new CompleteOnboarding(workers, settings, unitOfWork, clock, ids);
 
-ipcMain.handle(IPC.bootstrapGet, () => getBootstrapState.execute());
-ipcMain.handle(IPC.onboardingComplete, (_event, input: unknown) => completeOnboarding.execute(input as CompleteOnboardingInput));
-ipcMain.handle(IPC.windowHide, () => mainWindow?.hide());
+  ipcMain.handle(IPC.bootstrapGet, () => getBootstrapState.execute());
+  ipcMain.handle(IPC.onboardingComplete, (_event, input: unknown) => completeOnboarding.execute(input as CompleteOnboardingInput));
+  ipcMain.handle(IPC.windowHide, () => mainWindow?.hide());
 
-mainWindow = await createWindow();
-createTray();
+  mainWindow = await createWindow();
+  createTray();
 
-const configuredShortcut = settings.get().globalShortcut;
-if (configuredShortcut) {
-  const registered = globalShortcut.register(configuredShortcut, () => {
-    if (!mainWindow) return;
-    if (mainWindow.isVisible()) mainWindow.hide();
-    else showMainWindow();
+  const configuredShortcut = settings.get().globalShortcut;
+  if (configuredShortcut) {
+    const registered = globalShortcut.register(configuredShortcut, () => {
+      if (!mainWindow) return;
+      if (mainWindow.isVisible()) mainWindow.hide();
+      else showMainWindow();
+    });
+    if (!registered) console.warn(`Global shortcut could not be registered: ${configuredShortcut}`);
+  }
+
+  app.on('activate', showMainWindow);
+  app.on('before-quit', () => { isQuitting = true; });
+  app.on('will-quit', () => {
+    globalShortcut.unregisterAll();
+    db.close();
   });
-  if (!registered) console.warn(`Global shortcut could not be registered: ${configuredShortcut}`);
 }
 
-app.on('activate', showMainWindow);
-app.on('before-quit', () => { isQuitting = true; });
-app.on('will-quit', () => {
-  globalShortcut.unregisterAll();
-  db.close();
+void start().catch((error: unknown) => {
+  console.error('Failed to start OB-Tracker', error);
+  app.quit();
 });
