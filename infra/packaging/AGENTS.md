@@ -1,5 +1,7 @@
 # AGENTS.md — native packaging
 
+Also read `../../AGENTS.md` and `../../../AGENTS.md`; both remain applicable to this subtree.
+
 Packaging targets normal non-technical users. Runtime must remain offline and require no `.env`, Node, pnpm or Git.
 
 Current targets:

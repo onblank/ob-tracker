@@ -1,6 +1,8 @@
 # OB-Tracker ↔ onBlank Central Boundary
 
-Central does not exist yet; OB-Tracker defines the portable time-tracking contract first.
+Central exists as an independent sibling repository, but OB-Tracker remains deliberately isolated
+from it. OB-Tracker defines and owns the portable time-tracking contract; any Central importer is a
+separate, destination-owned capability and is not implemented by adding Central connectivity here.
 
 ## Shared concepts
 

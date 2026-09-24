@@ -1,5 +1,7 @@
 # AGENTS.md — apps/desktop
 
+Also read `../../AGENTS.md` and `../../../AGENTS.md`; both remain applicable to this subtree.
+
 Scope: Electron shell, preload bridge, renderer UI and OS integrations.
 
 ## Non-negotiable boundaries

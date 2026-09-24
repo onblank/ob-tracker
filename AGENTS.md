@@ -1,5 +1,17 @@
 # AGENTS.md — OB-Tracker master instructions
 
+This repository belongs to the onBlank Group workspace.
+
+Before making cross-product, AI, finance, billing, support, privacy, security, integration or shared
+contract changes, agents must also read `../AGENTS.md`. If it is unavailable, ask the user for the
+global onBlank context.
+
+Before changing this project's portable contract, licensing, security boundary or
+release/distribution model, the global file is mandatory.
+
+The global network-integration model does not authorize an OB-Tracker runtime connection: the
+offline and Central-prohibition rules below are stricter and remain authoritative.
+
 ## Product
 - Product: OB-Tracker
 - Brand: onBlank / onBlank Systems
@@ -10,6 +22,14 @@
 - Platforms: Windows, macOS, Linux
 
 Read the closest nested `AGENTS.md` too.
+
+## Current state
+
+This is an independent pnpm/Turborepo repository with the Electron desktop shell, Clean Architecture
+package boundaries, SQLite migrations, domain policies/tests, a documented `.obtracker` v1 contract
+and native packaging configuration. The renderer currently provides the application shell and local
+onboarding foundation; do not describe every planned navigation area or end-user workflow as shipped.
+There is no Central importer or runtime connection in this repository.
 
 ## Runtime boundary: OFFLINE
 

@@ -1,5 +1,7 @@
 # AGENTS.md — packages/db-sqlite
 
+Also read `../../AGENTS.md` and `../../../AGENTS.md`; both remain applicable to this subtree.
+
 This is the only package that owns raw SQL and the SQLite implementation.
 
 ## Stack
