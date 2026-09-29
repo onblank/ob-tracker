@@ -31,6 +31,12 @@ and native packaging configuration. The renderer currently provides the applicat
 onboarding foundation; do not describe every planned navigation area or end-user workflow as shipped.
 There is no Central importer or runtime connection in this repository.
 
+Central has a separate internal browser app at `../central/apps/tracker` for authenticated onBlank
+workers. It may reproduce relevant product workflows and domain semantics, but it is not this
+offline application, does not share its SQLite source of truth and does not authorize synchronization
+between the two runtimes. Any deliberate shared contract must preserve both projects' ownership
+boundaries.
+
 ## Runtime boundary: OFFLINE
 
 Never add runtime requirements for accounts, authentication, remote APIs, cloud services, telemetry,

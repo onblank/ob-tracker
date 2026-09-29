@@ -4,6 +4,10 @@ Central exists as an independent sibling repository, but OB-Tracker remains deli
 from it. OB-Tracker defines and owns the portable time-tracking contract; any Central importer is a
 separate, destination-owned capability and is not implemented by adding Central connectivity here.
 
+Central's internal `apps/tracker` web UI is a separate Central-owned application with Central
+authentication and persistence. Similar workflows do not make it a synchronized OB-Tracker client
+or grant either application access to the other's database.
+
 ## Shared concepts
 
 Worker identity for time ownership, Clients, Projects, Tasks, historical Billing Terms and Time Entries.
