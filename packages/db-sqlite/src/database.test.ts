@@ -2,10 +2,30 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { migrateDatabase, openDatabase } from './index';
+import {
+  CreateClient,
+  CreateProject,
+  GetTrackerState,
+  StartTimer,
+  StopTimer,
+} from '@obt/application';
+import type { Clock, IdGenerator, TimeZoneProvider } from '@obt/contracts';
+import {
+  migrateDatabase,
+  openDatabase,
+  SqliteBillingTermRepository,
+  SqliteClientRepository,
+  SqliteProjectRepository,
+  SqliteSettingsRepository,
+  SqliteTimeEntryRepository,
+  SqliteUnitOfWork,
+  SqliteWorkerRepository,
+} from './index';
 
 const roots: string[] = [];
-afterEach(() => { while (roots.length) rmSync(roots.pop()!, { recursive: true, force: true }); });
+afterEach(() => {
+  while (roots.length) rmSync(roots.pop()!, { recursive: true, force: true });
+});
 
 function makeDb() {
   const dir = mkdtempSync(join(tmpdir(), 'obt-db-'));
@@ -24,40 +44,263 @@ const ids = {
 
 function seedHierarchy(db: ReturnType<typeof makeDb>) {
   const now = '2026-09-15T10:00:00.000Z';
-  db.prepare('INSERT INTO workers VALUES (?, ?, ?, ?, ?)').run(ids.worker, 'Worker', null, now, now);
-  db.prepare(`INSERT INTO clients(id,name,description,color_hex,work_type,created_at,updated_at,archived_at) VALUES (?,?,?,?,?,?,?,?)`)
-    .run(ids.client, 'Client', '', null, 'billable', now, now, null);
-  db.prepare(`INSERT INTO projects(id,client_id,name,description,status,color_hex,work_type_override,estimated_seconds,budget_amount_minor,budget_currency_code,created_at,updated_at,completed_at,archived_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-    .run(ids.project, ids.client, 'Project', '', 'in_progress', null, null, null, null, null, now, now, null, null);
-  db.prepare(`INSERT INTO tasks(id,project_id,name,description,status,color_hex,work_type_override,estimated_seconds,budget_amount_minor,budget_currency_code,created_at,updated_at,completed_at,archived_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-    .run(ids.task, ids.project, 'Task', '', 'in_progress', null, null, null, null, null, now, now, null, null);
+  db.prepare('INSERT INTO workers VALUES (?, ?, ?, ?, ?)').run(
+    ids.worker,
+    'Worker',
+    null,
+    now,
+    now,
+  );
+  db.prepare(
+    `INSERT INTO clients(id,name,description,color_hex,work_type,created_at,updated_at,archived_at) VALUES (?,?,?,?,?,?,?,?)`,
+  ).run(ids.client, 'Client', '', null, 'billable', now, now, null);
+  db.prepare(
+    `INSERT INTO projects(id,client_id,name,description,status,color_hex,work_type_override,estimated_seconds,budget_amount_minor,budget_currency_code,created_at,updated_at,completed_at,archived_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+  ).run(
+    ids.project,
+    ids.client,
+    'Project',
+    '',
+    'in_progress',
+    null,
+    null,
+    null,
+    null,
+    null,
+    now,
+    now,
+    null,
+    null,
+  );
+  db.prepare(
+    `INSERT INTO tasks(id,project_id,name,description,status,color_hex,work_type_override,estimated_seconds,budget_amount_minor,budget_currency_code,created_at,updated_at,completed_at,archived_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+  ).run(
+    ids.task,
+    ids.project,
+    'Task',
+    '',
+    'in_progress',
+    null,
+    null,
+    null,
+    null,
+    null,
+    now,
+    now,
+    null,
+    null,
+  );
 }
 
 describe('SQLite schema', () => {
   it('runs every migration', () => {
     const db = makeDb();
-    expect((db.prepare('SELECT COUNT(*) AS count FROM schema_migrations').get() as { count:number }).count).toBe(12);
+    expect(
+      (db.prepare('SELECT COUNT(*) AS count FROM schema_migrations').get() as { count: number })
+        .count,
+    ).toBe(12);
     db.close();
   });
 
   it('rejects overlapping entries and permits touching intervals', () => {
-    const db = makeDb(); seedHierarchy(db);
+    const db = makeDb();
+    seedHierarchy(db);
     const insert = db.prepare(`INSERT INTO time_entries(
       id,worker_id,client_id,project_id,task_id,started_at,ended_at,started_timezone,started_utc_offset_minutes,ended_timezone,ended_utc_offset_minutes,note,source,stop_reason,work_type_snapshot,billing_model_snapshot,billing_term_id_snapshot,hourly_rate_minor_snapshot,currency_code_snapshot,rounding_mode_snapshot,rounding_increment_minutes_snapshot,raw_duration_seconds,rounded_duration_seconds,calculated_amount_minor,created_at,updated_at
     ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`);
-    const row = (id:string,start:string,end:string) => [id,ids.worker,ids.client,ids.project,ids.task,start,end,'Europe/Madrid',120,'Europe/Madrid',120,'','manual','manual','billable','none',null,null,null,'none',1,3600,3600,0,start,start];
-    insert.run(...row('00000000-0000-4000-8000-000000000010','2026-09-15T10:00:00.000Z','2026-09-15T11:00:00.000Z'));
-    expect(() => insert.run(...row('00000000-0000-4000-8000-000000000011','2026-09-15T10:30:00.000Z','2026-09-15T11:30:00.000Z'))).toThrow(/overlaps/);
-    expect(() => insert.run(...row('00000000-0000-4000-8000-000000000012','2026-09-15T11:00:00.000Z','2026-09-15T12:00:00.000Z'))).not.toThrow();
+    const row = (id: string, start: string, end: string) => [
+      id,
+      ids.worker,
+      ids.client,
+      ids.project,
+      ids.task,
+      start,
+      end,
+      'Europe/Madrid',
+      120,
+      'Europe/Madrid',
+      120,
+      '',
+      'manual',
+      'manual',
+      'billable',
+      'none',
+      null,
+      null,
+      null,
+      'none',
+      1,
+      3600,
+      3600,
+      0,
+      start,
+      start,
+    ];
+    insert.run(
+      ...row(
+        '00000000-0000-4000-8000-000000000010',
+        '2026-09-15T10:00:00.000Z',
+        '2026-09-15T11:00:00.000Z',
+      ),
+    );
+    expect(() =>
+      insert.run(
+        ...row(
+          '00000000-0000-4000-8000-000000000011',
+          '2026-09-15T10:30:00.000Z',
+          '2026-09-15T11:30:00.000Z',
+        ),
+      ),
+    ).toThrow(/overlaps/);
+    expect(() =>
+      insert.run(
+        ...row(
+          '00000000-0000-4000-8000-000000000012',
+          '2026-09-15T11:00:00.000Z',
+          '2026-09-15T12:00:00.000Z',
+        ),
+      ),
+    ).not.toThrow();
     db.close();
   });
 
   it('allows at most one active timer', () => {
-    const db = makeDb(); seedHierarchy(db);
+    const db = makeDb();
+    seedHierarchy(db);
     const sql = `INSERT INTO time_entries(id,worker_id,client_id,project_id,task_id,started_at,ended_at,started_timezone,started_utc_offset_minutes,ended_timezone,ended_utc_offset_minutes,note,source,stop_reason,work_type_snapshot,billing_model_snapshot,billing_term_id_snapshot,hourly_rate_minor_snapshot,currency_code_snapshot,rounding_mode_snapshot,rounding_increment_minutes_snapshot,raw_duration_seconds,rounded_duration_seconds,calculated_amount_minor,created_at,updated_at) VALUES (?,?,?,?,?, ?,NULL,?, ?,NULL,NULL,'','timer',NULL,'billable','none',NULL,NULL,NULL,'none',1,NULL,NULL,NULL,?,?)`;
-    const insert=db.prepare(sql);
-    insert.run('00000000-0000-4000-8000-000000000020',ids.worker,ids.client,ids.project,ids.task,'2026-09-15T10:00:00.000Z','Europe/Madrid',120,'2026-09-15T10:00:00.000Z','2026-09-15T10:00:00.000Z');
-    expect(()=>insert.run('00000000-0000-4000-8000-000000000021',ids.worker,ids.client,ids.project,ids.task,'2026-09-15T11:00:00.000Z','Europe/Madrid',120,'2026-09-15T11:00:00.000Z','2026-09-15T11:00:00.000Z')).toThrow();
+    const insert = db.prepare(sql);
+    insert.run(
+      '00000000-0000-4000-8000-000000000020',
+      ids.worker,
+      ids.client,
+      ids.project,
+      ids.task,
+      '2026-09-15T10:00:00.000Z',
+      'Europe/Madrid',
+      120,
+      '2026-09-15T10:00:00.000Z',
+      '2026-09-15T10:00:00.000Z',
+    );
+    expect(() =>
+      insert.run(
+        '00000000-0000-4000-8000-000000000021',
+        ids.worker,
+        ids.client,
+        ids.project,
+        ids.task,
+        '2026-09-15T11:00:00.000Z',
+        'Europe/Madrid',
+        120,
+        '2026-09-15T11:00:00.000Z',
+        '2026-09-15T11:00:00.000Z',
+      ),
+    ).toThrow();
+    db.close();
+  });
+});
+
+class MutableClock implements Clock {
+  public constructor(private current: Date) {}
+  public now(): Date {
+    return new Date(this.current);
+  }
+  public monotonicMilliseconds(): number {
+    return 0;
+  }
+  public set(value: string): void {
+    this.current = new Date(value);
+  }
+}
+
+class SequenceIds implements IdGenerator {
+  private next = 100;
+  public generate(): string {
+    this.next += 1;
+    return `00000000-0000-4000-8000-${this.next.toString().padStart(12, '0')}`;
+  }
+}
+
+const fixedTimeZone: TimeZoneProvider = {
+  current: () => ({ timeZone: 'Europe/Madrid', utcOffsetMinutes: 120 }),
+};
+
+describe('first tracked session', () => {
+  it('persists the complete client, project and timer workflow', () => {
+    const db = makeDb();
+    const createdAt = '2026-09-15T08:00:00.000Z';
+    db.prepare('INSERT INTO workers VALUES (?, ?, ?, ?, ?)').run(
+      ids.worker,
+      'Worker',
+      null,
+      createdAt,
+      createdAt,
+    );
+
+    const workers = new SqliteWorkerRepository(db);
+    const clients = new SqliteClientRepository(db);
+    const projects = new SqliteProjectRepository(db);
+    const billingTerms = new SqliteBillingTermRepository(db);
+    const entries = new SqliteTimeEntryRepository(db);
+    const settings = new SqliteSettingsRepository(db);
+    const unitOfWork = new SqliteUnitOfWork(db);
+    const clock = new MutableClock(new Date('2026-09-15T10:00:00.000Z'));
+    const generatedIds = new SequenceIds();
+
+    const createClient = new CreateClient(
+      clients,
+      billingTerms,
+      settings,
+      unitOfWork,
+      clock,
+      generatedIds,
+    );
+    const createProject = new CreateProject(clients, projects, clock, generatedIds);
+    const startTimer = new StartTimer(
+      workers,
+      clients,
+      projects,
+      billingTerms,
+      entries,
+      settings,
+      unitOfWork,
+      clock,
+      fixedTimeZone,
+      generatedIds,
+    );
+    const stopTimer = new StopTimer(workers, entries, unitOfWork, clock, fixedTimeZone);
+
+    const client = createClient.execute({ name: 'Acme' });
+    const project = createProject.execute({ clientId: client.id, name: 'Launch' });
+    startTimer.execute({ projectId: project.id, note: 'First session' });
+
+    const recoveredState = new GetTrackerState(
+      workers,
+      clients,
+      projects,
+      entries,
+      clock,
+    ).execute();
+    expect(recoveredState.activeEntry?.projectName).toBe('Launch');
+    expect(projects.getById(project.id)?.status).toBe('in_progress');
+
+    clock.set('2026-09-15T11:00:00.000Z');
+    stopTimer.execute();
+    const completedState = new GetTrackerState(
+      workers,
+      clients,
+      projects,
+      entries,
+      clock,
+    ).execute();
+    expect(completedState.activeEntry).toBeNull();
+    expect(completedState.todayEntries).toHaveLength(1);
+    expect(completedState.todayEntries[0]?.rawDurationSeconds).toBe(3600);
+    expect(completedState.todayTotals).toEqual({
+      trackedSeconds: 3600,
+      billableSeconds: 3600,
+      nonBillableSeconds: 0,
+      learningSeconds: 0,
+    });
     db.close();
   });
 });

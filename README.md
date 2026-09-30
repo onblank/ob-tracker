@@ -74,6 +74,8 @@ provide `.exe`, `.dmg`, `.AppImage` and `.deb` downloads.
 
 See `docs/RELEASING.md`.
 
+The functional delivery sequence is tracked in [`docs/ITERATION_PLAN.md`](docs/ITERATION_PLAN.md).
+
 ## License
 
 Source: Apache-2.0. Brand/trademark rights are separate; see `TRADEMARK.md`.
