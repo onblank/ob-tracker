@@ -11,6 +11,7 @@ Use Conventional Commits. Release Please prepares version/changelog PRs.
 Normal users must not need Node, pnpm, Git or `.env` files.
 
 Official release pipeline targets:
+
 - Windows x64: NSIS `.exe`
 - macOS universal: `.dmg`
 - Linux x64: `.AppImage` and `.deb`

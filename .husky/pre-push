@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+
+BRANCH=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)
+case "$BRANCH" in
+  feature/*|fix/*|refactor/*|docs/*|chore/*|hotfix/*) ;;
+  *)
+    echo "Push blocked: push a task branch and open a PR (current: ${BRANCH:-detached HEAD})."
+    exit 1
+    ;;
+esac
+
+while read -r _LOCAL_REF _LOCAL_SHA REMOTE_REF _REMOTE_SHA; do
+  case "$REMOTE_REF" in
+    refs/heads/dev|refs/heads/main|refs/heads/master)
+      echo "Push blocked: direct pushes to protected branches are forbidden. Open a reviewed pull request."
+      exit 1
+      ;;
+  esac
+done
+
+pnpm check

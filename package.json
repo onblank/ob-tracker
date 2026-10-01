@@ -23,7 +23,8 @@
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "prepare": "husky",
     "postinstall": "pnpm --filter @obt/desktop exec electron-builder install-app-deps"
   },
   "devDependencies": {
@@ -31,6 +32,7 @@
     "@playwright/test": "1.63.0",
     "@types/node": "24.13.4",
     "eslint": "10.10.0",
+    "husky": "9.1.7",
     "prettier": "3.9.6",
     "turbo": "2.10.13",
     "typescript": "5.9.3",

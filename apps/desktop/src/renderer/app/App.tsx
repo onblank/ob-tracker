@@ -14,13 +14,29 @@ export function App() {
       return;
     }
 
-    desktopApi.getBootstrapState().then(setState).catch((reason: unknown) => {
-      setError(reason instanceof Error ? reason.message : 'Unable to initialize OB-Tracker');
-    });
+    desktopApi
+      .getBootstrapState()
+      .then(setState)
+      .catch((reason: unknown) => {
+        setError(reason instanceof Error ? reason.message : 'Unable to initialize OB-Tracker');
+      });
   }, []);
 
-  if (error) return <main className="fatal-screen"><h1>OB-Tracker</h1><p>{error}</p></main>;
-  if (!state) return <main className="loading-screen"><div className="loading-mark">OB</div><p>Loading local workspace…</p></main>;
-  if (state.needsOnboarding) return <Onboarding initialSettings={state.settings} onComplete={setState} />;
+  if (error)
+    return (
+      <main className="fatal-screen">
+        <h1>OB-Tracker</h1>
+        <p>{error}</p>
+      </main>
+    );
+  if (!state)
+    return (
+      <main className="loading-screen">
+        <div className="loading-mark">OB</div>
+        <p>Loading local workspace…</p>
+      </main>
+    );
+  if (state.needsOnboarding)
+    return <Onboarding initialSettings={state.settings} onComplete={setState} />;
   return <AppShell state={state} />;
 }

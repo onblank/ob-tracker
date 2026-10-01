@@ -19,7 +19,10 @@ function waitForPort(port) {
   return new Promise((resolveReady) => {
     const attempt = () => {
       const socket = net.connect(port, '127.0.0.1');
-      socket.once('connect', () => { socket.destroy(); resolveReady(); });
+      socket.once('connect', () => {
+        socket.destroy();
+        resolveReady();
+      });
       socket.once('error', () => setTimeout(attempt, 150));
     };
     attempt();
@@ -28,7 +31,7 @@ function waitForPort(port) {
 
 function waitForFile(path) {
   return new Promise((resolveReady) => {
-    const attempt = () => existsSync(path) ? resolveReady() : setTimeout(attempt, 150);
+    const attempt = () => (existsSync(path) ? resolveReady() : setTimeout(attempt, 150));
     attempt();
   });
 }

@@ -6,4 +6,8 @@ import { App } from './app/App';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Renderer root element is missing');
-createRoot(root).render(<React.StrictMode><App /></React.StrictMode>);
+createRoot(root).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);

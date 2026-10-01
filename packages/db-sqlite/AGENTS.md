@@ -23,6 +23,7 @@ Preserve onBlank ordering conventions while respecting SQLite capabilities:
 Never edit a migration after it has shipped in a public release. Add a new migration.
 
 Any shared-domain schema change must update in the same change:
+
 - SQL migration(s)
 - `docs/DATA_MODEL.md`
 - `docs/EXPORT_FORMAT.md` if portable fields change

@@ -9,7 +9,11 @@ export default defineConfig({
     outDir: 'dist/preload',
     emptyOutDir: true,
     sourcemap: true,
-    lib: { entry: resolve(here, 'src/preload/preload.ts'), formats: ['cjs'], fileName: () => 'preload.cjs' },
+    lib: {
+      entry: resolve(here, 'src/preload/preload.ts'),
+      formats: ['cjs'],
+      fileName: () => 'preload.cjs',
+    },
     rollupOptions: { external: (id) => id === 'electron' || id.startsWith('node:') },
   },
 });

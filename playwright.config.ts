@@ -1,2 +1,6 @@
 import { defineConfig } from '@playwright/test';
-export default defineConfig({ testDir: './apps/desktop/e2e', timeout: 30_000, use: { trace: 'on-first-retry' } });
+export default defineConfig({
+  testDir: './apps/desktop/e2e',
+  timeout: 30_000,
+  use: { trace: 'on-first-retry' },
+});

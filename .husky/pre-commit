@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+BRANCH=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)
+case "$BRANCH" in
+  feature/*|fix/*|refactor/*|docs/*|chore/*|hotfix/*) ;;
+  *)
+    echo "Commit blocked: use a task branch from dev (current: ${BRANCH:-detached HEAD})."
+    exit 1
+    ;;
+esac
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
+if echo "$STAGED_FILES" | grep -E '(^|/)\.env($|\.|/)' | grep -vE '\.env\.example$|\.env\.[^.]+\.example$' >/dev/null 2>&1; then
+  echo "Commit blocked: staged runtime .env file detected. Commit only documented .env example files."
+  exit 1
+fi
+
+pnpm lint

@@ -13,17 +13,16 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "paths": {
-      "@obt/domain": ["packages/domain/src/index.ts"],
-      "@obt/application": ["packages/application/src/index.ts"],
-      "@obt/contracts": ["packages/contracts/src/index.ts"],
-      "@obt/db-sqlite": ["packages/db-sqlite/src/index.ts"],
-      "@obt/import-export": ["packages/import-export/src/index.ts"],
-      "@obt/settings": ["packages/settings/src/index.ts"],
-      "@obt/shared": ["packages/shared/src/index.ts"],
-      "@obt/ui": ["packages/ui/src/index.tsx"],
-      "@obt/test-utils": ["packages/test-utils/src/index.ts"]
+      "@obt/domain": ["./packages/domain/src/index.ts"],
+      "@obt/application": ["./packages/application/src/index.ts"],
+      "@obt/contracts": ["./packages/contracts/src/index.ts"],
+      "@obt/db-sqlite": ["./packages/db-sqlite/src/index.ts"],
+      "@obt/import-export": ["./packages/import-export/src/index.ts"],
+      "@obt/settings": ["./packages/settings/src/index.ts"],
+      "@obt/shared": ["./packages/shared/src/index.ts"],
+      "@obt/ui": ["./packages/ui/src/index.tsx"],
+      "@obt/test-utils": ["./packages/test-utils/src/index.ts"]
     }
   }
 }

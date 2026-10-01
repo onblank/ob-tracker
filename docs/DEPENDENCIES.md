@@ -3,6 +3,7 @@
 Versions are pinned exactly at repository generation time.
 
 Core baseline:
+
 - Node 24 LTS
 - pnpm 12.4.1
 - Electron 44.3.0

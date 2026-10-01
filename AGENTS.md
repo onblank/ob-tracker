@@ -1,5 +1,12 @@
 # AGENTS.md — OB-Tracker master instructions
 
+## Branch policy
+
+Create ordinary work from current `dev` on a short-lived `feature/*`, `fix/*`, `refactor/*`,
+`docs/*` or `chore/*` branch. Merge it into protected `dev` through a reviewed PR with required CI;
+promote `dev` into protected `main` through a separate reviewed PR. Never work directly on either
+protected branch. Follow `../docs/git-workflow.md`.
+
 This repository belongs to the onBlank Group workspace.
 
 Before making cross-product, AI, finance, billing, support, privacy, security, integration or shared
@@ -13,6 +20,7 @@ The global network-integration model does not authorize an OB-Tracker runtime co
 offline and Central-prohibition rules below are stricter and remain authoritative.
 
 ## Product
+
 - Product: OB-Tracker
 - Brand: onBlank / onBlank Systems
 - Repository: `ob-tracker`
@@ -197,6 +205,7 @@ preload, validate IPC input, renderer never opens SQLite/filesystem directly.
 ## Brand palette
 
 Canonical HEX:
+
 - Navy #182332
 - Blue #5C6BFF
 - Cloud White #F7F8FC
