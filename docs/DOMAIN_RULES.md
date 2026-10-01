@@ -43,12 +43,14 @@ Persist full instants, not “date + clock time”. Entries may cross midnight/m
 One active timer maximum. Overlaps are forbidden. Touching intervals are allowed.
 
 Starting another timer while one is active offers:
+
 1. stop current and start requested;
 2. cancel.
 
 ## Manual entries
 
 Allowed, but reject:
+
 - zero/negative duration;
 - future start/end;
 - end <= start;
