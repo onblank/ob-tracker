@@ -4,11 +4,11 @@
 
 ```css
 --onblank-navy: #182332;
---onblank-blue: #5C6BFF;
---onblank-cloud-white: #F7F8FC;
---onblank-soft-blue-gray: #DCEBFF;
---onblank-graphite: #2D3645;
---onblank-signal-lime: #B8FFD8;
+--onblank-blue: #5c6bff;
+--onblank-cloud-white: #f7f8fc;
+--onblank-soft-blue-gray: #dcebff;
+--onblank-graphite: #2d3645;
+--onblank-signal-lime: #b8ffd8;
 ```
 
 The supplied brand reference contains some RGB labels that do not numerically match the printed HEX values. The printed HEX values are canonical for this repository.

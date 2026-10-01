@@ -11,13 +11,13 @@ extraResources:
   - from: ../../packages/db-sqlite/migrations
     to: migrations
     filter:
-      - "*.sql"
+      - '*.sql'
   - from: build/tray-icon.png
     to: tray-icon.png
 directories:
   output: release
   buildResources: build
-artifactName: "OB-Tracker-${version}-${os}-${arch}.${ext}"
+artifactName: 'OB-Tracker-${version}-${os}-${arch}.${ext}'
 fileAssociations:
   - ext: obtracker
     name: OB-Tracker Data Export

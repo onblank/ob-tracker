@@ -5,6 +5,7 @@ Also read `../../AGENTS.md` and `../../../AGENTS.md`; both remain applicable to 
 Packaging targets normal non-technical users. Runtime must remain offline and require no `.env`, Node, pnpm or Git.
 
 Current targets:
+
 - Windows x64 NSIS `.exe`
 - macOS universal `.dmg`
 - Linux x64 `.AppImage` + `.deb`

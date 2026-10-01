@@ -13,7 +13,10 @@ export type RoundingMode = (typeof ROUNDING_MODES)[number];
 export const ROUNDING_INCREMENTS_MINUTES = [1, 5, 6, 10, 15, 30, 60] as const;
 export type RoundingIncrementMinutes = (typeof ROUNDING_INCREMENTS_MINUTES)[number];
 
-export interface Money { readonly amountMinor: number; readonly currencyCode: string; }
+export interface Money {
+  readonly amountMinor: number;
+  readonly currencyCode: string;
+}
 
 export interface BillingTermView {
   readonly id: string;

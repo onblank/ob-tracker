@@ -28,9 +28,7 @@ Every shared-domain column from `docs/DATA_MODEL.md` is exported. Desktop-only c
   "appVersion": "0.1.0",
   "exportedAt": "2026-09-15T17:00:00.000Z",
   "workerId": "uuid",
-  "files": [
-    { "name": "workers.csv", "rowCount": 1, "sha256": "..." }
-  ]
+  "files": [{ "name": "workers.csv", "rowCount": 1, "sha256": "..." }]
 }
 ```
 
@@ -76,6 +74,7 @@ These headers are also exposed as constants by `@obt/import-export`; change them
 ## Import v1
 
 Before any mutation:
+
 1. validate container and manifest;
 2. validate supported schema version;
 3. validate each declared file/hash/row count;
@@ -96,6 +95,7 @@ Apply the native import in one database transaction.
 ### ID conflicts
 
 For schema v1:
+
 - same UUID + byte/semantic-equivalent shared record: idempotently skip;
 - same UUID + conflicting record: abort the whole import;
 - no partial merge heuristics.

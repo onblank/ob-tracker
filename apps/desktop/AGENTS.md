@@ -20,6 +20,7 @@ React + TypeScript + Vite + Tailwind.
 Feature folders may own UI state and presentation, but domain decisions belong in `@obt/domain` and orchestration in `@obt/application`.
 
 Navigation areas:
+
 - Dashboard
 - Timer
 - Time Entries
@@ -37,6 +38,7 @@ The Client → Project → Task relationship is a data hierarchy, not a navigati
 ## Electron security
 
 Required:
+
 - `contextIsolation: true`
 - `nodeIntegration: false`
 - sandboxed renderer where compatible
@@ -46,6 +48,7 @@ Required:
 ## OS integration
 
 Support Windows, macOS and Linux for:
+
 - tray/menu-bar controls
 - configurable global shortcut
 - idle detection
@@ -59,6 +62,7 @@ Closing the main window hides to tray when configured. Explicit Quit exits the p
 ## Branding assets
 
 Canonical replace-in-place files:
+
 - `src/renderer/assets/brand/onblank-logo.svg`
 - `src/renderer/assets/brand/powered-by-onblank.svg`
 - `src/renderer/assets/brand/ob-tracker-logo.svg`
