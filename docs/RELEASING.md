@@ -32,9 +32,11 @@ Official release pipeline targets:
 
 GitHub Releases is the initial download surface. A future `onblanksystems.com/OpenSource` page can link to or mirror the same assets.
 
-The Release workflow can also be dispatched manually with an existing `release_tag`. This recovery
-path rebuilds and uploads native assets for an already-created GitHub Release; it does not calculate
-a version or create a release PR.
+The Release workflow can also be dispatched manually with an existing `release_tag`. By default it
+rebuilds that immutable tag. An optional `source_ref` may identify a later packaging-only correction;
+the workflow rejects it unless the source package version still matches the release tag. This
+recovery path uploads native assets for an already-created GitHub Release; it does not calculate a
+version, move a tag or create a release PR.
 
 ## Signing
 
