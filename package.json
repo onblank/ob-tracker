@@ -1,6 +1,6 @@
 {
   "name": "ob-tracker",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "OB-Tracker — offline open-source desktop time tracker by onBlank",
   "license": "Apache-2.0",
