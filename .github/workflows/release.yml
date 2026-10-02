@@ -4,27 +4,49 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing release tag whose native assets should be rebuilt
+        required: true
+        type: string
 
 permissions:
   contents: write
+  issues: write
   pull-requests: write
 
 jobs:
   release-please:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
+      - id: app-token
+        name: Create release automation token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.ONBLANK_RELEASE_APP_ID }}
+          private-key: ${{ secrets.ONBLANK_RELEASE_APP_PRIVATE_KEY }}
+
       - id: release
         uses: googleapis/release-please-action@v5
         with:
+          token: ${{ steps.app-token.outputs.token }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
   native-builds:
     needs: release-please
-    if: needs.release-please.outputs.release_created == 'true'
+    if: >-
+      ${{
+        always() &&
+        ((github.event_name == 'push' &&
+          needs.release-please.result == 'success' &&
+          needs.release-please.outputs.release_created == 'true') ||
+         (github.event_name == 'workflow_dispatch' && inputs.release_tag != ''))
+      }}
     strategy:
       fail-fast: false
       matrix:
@@ -39,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release-please.outputs.tag_name }}
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || needs.release-please.outputs.tag_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -67,7 +89,13 @@ jobs:
 
   publish-assets:
     needs: [release-please, native-builds]
-    if: needs.release-please.outputs.release_created == 'true'
+    if: >-
+      ${{
+        always() &&
+        needs.native-builds.result == 'success' &&
+        ((github.event_name == 'push' && needs.release-please.outputs.release_created == 'true') ||
+         (github.event_name == 'workflow_dispatch' && inputs.release_tag != ''))
+      }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -78,7 +106,7 @@ jobs:
       - name: Upload release assets
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ needs.release-please.outputs.tag_name }}
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || needs.release-please.outputs.tag_name }}
         run: |
           find artifacts -type f -exec gh release upload "$TAG" {} --clobber \;
           gh release upload "$TAG" SHA256SUMS --clobber
