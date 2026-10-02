@@ -18,6 +18,7 @@ directories:
   output: release
   buildResources: build
 artifactName: 'OB-Tracker-${version}-${os}-${arch}.${ext}'
+publish: null
 fileAssociations:
   - ext: obtracker
     name: OB-Tracker Data Export
@@ -30,7 +31,6 @@ win:
     - target: nsis
       arch:
         - x64
-  publisherName: onBlank Systems
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
