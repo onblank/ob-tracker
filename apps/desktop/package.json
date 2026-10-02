@@ -1,6 +1,8 @@
 {
   "name": "@obt/desktop",
   "version": "0.2.0",
+  "description": "OB-Tracker — offline open-source desktop time tracker by onBlank",
+  "author": "onBlank Systems",
   "private": true,
   "type": "module",
   "main": "dist/main/main.js",
