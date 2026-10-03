@@ -30,7 +30,7 @@ jobs:
     steps:
       - id: app-token
         name: Create release automation token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ vars.ONBLANK_RELEASE_APP_ID }}
           private-key: ${{ secrets.ONBLANK_RELEASE_APP_PRIVATE_KEY }}
@@ -64,10 +64,10 @@ jobs:
             command: package:linux
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && (inputs.source_ref || inputs.release_tag) || needs.release-please.outputs.tag_name }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Validate recovery source version
@@ -98,10 +98,14 @@ jobs:
       - name: Build installer
         run: pnpm ${{ matrix.command }}
       - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: native-${{ runner.os }}
-          path: apps/desktop/release/*
+          path: |
+            apps/desktop/release/*.exe
+            apps/desktop/release/*.dmg
+            apps/desktop/release/*.AppImage
+            apps/desktop/release/*.deb
           if-no-files-found: error
 
   publish-assets:
@@ -115,15 +119,18 @@ jobs:
       }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
-      - name: Create checksums
-        run: find artifacts -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+      - name: Collect release assets and create checksums
+        run: |
+          mkdir release-assets
+          find artifacts -type f -exec cp {} release-assets/ \;
+          cd release-assets
+          sha256sum * > ../SHA256SUMS
       - name: Upload release assets
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || needs.release-please.outputs.tag_name }}
-        run: |
-          find artifacts -type f -exec gh release upload "$TAG" {} --clobber \;
-          gh release upload "$TAG" SHA256SUMS --clobber
+        run: gh release upload "$TAG" release-assets/* SHA256SUMS --clobber
