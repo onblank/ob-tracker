@@ -3,6 +3,8 @@
   "version": "0.2.0",
   "description": "OB-Tracker — offline open-source desktop time tracker by onBlank",
   "author": "onBlank Systems",
+  "homepage": "https://github.com/onblank/ob-tracker",
+  "desktopName": "OB-Tracker",
   "private": true,
   "type": "module",
   "main": "dist/main/main.js",
