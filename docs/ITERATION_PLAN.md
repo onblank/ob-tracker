@@ -1,8 +1,8 @@
-# OB-Tracker Iteration Plan
+# OB-Tracker — First tracked session acceptance
 
-This plan turns the existing offline desktop foundation into a usable product through small vertical
-slices. Each iteration must preserve the Clean Architecture boundaries, SQLite as the local source of
-truth, the one-worker model and the prohibition on runtime network access.
+The canonical delivery plan is [ROADMAP.md](../ROADMAP.md). This file preserves the original
+acceptance record for roadmap iteration 1.1. The original iterations 2–5 are tracked as phases
+2–5 in the roadmap, with native packaging and platform acceptance moved to phase 6.
 
 ## Iteration 1 — First tracked session
 
@@ -41,37 +41,6 @@ Acceptance criteria:
 - Starting and stopping are persisted immediately; renderer state is never authoritative.
 - Closed entries retain work type, billing and rounding snapshots.
 - `pnpm check` passes and the happy path is covered by automated tests.
-
-## Iteration 2 — Reliable daily time management
-
-- Add manual time entries with future, duration and overlap validation.
-- Edit notes and safe fields on closed entries without changing factual history.
-- Implement timer recovery auto-stop and the configured maximum duration.
-- Add explicit stop-current-and-start behavior.
-- Add daily navigation and useful empty/error states.
-
-## Iteration 3 — Tasks and work organization
-
-- Create, edit, archive and reopen Clients, Projects and Tasks.
-- Track optionally against a Task while always retaining Client + Project.
-- Implement status transitions, estimates, budgets, favorites and recents.
-- Add direct filtering/search across the hierarchy.
-
-## Iteration 4 — Billing and reporting
-
-- Manage effective-dated billing terms for Clients, Projects and Tasks.
-- Surface inherited work type and billing resolution before tracking.
-- Add daily/weekly/monthly reports with raw and rounded durations.
-- Report hourly calculated value and fixed contract value without accounting revenue recognition.
-- Export generic CSV reports.
-
-## Iteration 5 — Desktop resilience and portability
-
-- Implement idle detection and explicit idle-resolution flows.
-- Add safe SQLite backup, restore, reminders and retention.
-- Implement validate-first transactional `.obtracker` import/export.
-- Complete tray/global-shortcut behavior and surface registration failures.
-- Add native-package smoke coverage for Windows, macOS and Linux.
 
 ## Verification policy
 

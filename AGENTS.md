@@ -19,6 +19,11 @@ release/distribution model, the global file is mandatory.
 The global network-integration model does not authorize an OB-Tracker runtime connection: the
 offline and Central-prohibition rules below are stricter and remain authoritative.
 
+## Development roadmap
+
+Use [ROADMAP.md](ROADMAP.md) to select the next ready iteration and record closure evidence in
+its implementation PR.
+
 ## Product
 
 - Product: OB-Tracker
